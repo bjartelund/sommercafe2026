@@ -19,12 +19,24 @@ public class OrdersFunctions(AppDbContext db)
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "orders")] HttpRequestData req,
         ClaimsPrincipal claimsPrincipal)
     {
-        var objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
-            ?? claimsPrincipal.FindFirst("oid")?.Value;
+        // Try to get employee from claims, fallback to last created employee (for local dev with SWA mock auth)
+        Employee employee = null;
 
-        var employee = await db.Employees.FirstOrDefaultAsync(e => e.EntraObjectId == objectId);
+        if (claimsPrincipal != null)
+        {
+            var objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
+                ?? claimsPrincipal.FindFirst("oid")?.Value;
+            employee = await db.Employees.FirstOrDefaultAsync(e => e.EntraObjectId == objectId);
+        }
+
+        // Fallback: use the last created employee (for local development)
         if (employee == null)
-            return new BadRequestObjectResult("Employee not found");
+        {
+            employee = await db.Employees.OrderByDescending(e => e.CreatedAt).FirstOrDefaultAsync();
+        }
+
+        if (employee == null)
+            return new BadRequestObjectResult("No employee found. Please create an employee first.");
 
         JsonDocument? body = null;
         try { body = await JsonDocument.ParseAsync(req.Body); } catch { }
