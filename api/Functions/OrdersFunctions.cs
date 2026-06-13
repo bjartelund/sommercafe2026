@@ -6,12 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Security.Claims;
 using System.Text.Json;
 
 namespace CafeApp.Functions;
 
-public class OrdersFunctions(AppDbContext db)
+public class OrdersFunctions(AppDbContext db, ILogger<OrdersFunctions> logger)
 {
     [Authorize]
     [Function("CreateOrder")]
@@ -19,6 +20,7 @@ public class OrdersFunctions(AppDbContext db)
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "orders")] HttpRequestData req,
         ClaimsPrincipal claimsPrincipal)
     {
+        logger.LogInformation("CreateOrder invoked");
         // Try to get employee from claims, fallback to last created employee (for local dev with SWA mock auth)
         Employee employee = null;
 
@@ -77,7 +79,9 @@ public class OrdersFunctions(AppDbContext db)
 
         order.TotalAmount = totalAmount;
         db.Orders.Add(order);
+        logger.LogInformation("Saving order with {LineCount} lines and total {Total}", order.OrderLines.Count, order.TotalAmount);
         await db.SaveChangesAsync();
+        logger.LogInformation("Order {OrderId} saved successfully", order.Id);
 
         return new CreatedResult($"/api/orders/{order.Id}", order);
     }

@@ -17,5 +17,6 @@ builder.Services.AddMudServices();
 builder.Services.AddScoped<EmployeeService>();
 builder.Services.AddScoped<ProductsService>();
 builder.Services.AddScoped<OrdersService>();
+builder.Services.AddScoped<LedgerService>();
 
 await builder.Build().RunAsync();

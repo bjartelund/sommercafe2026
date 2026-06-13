@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace CafeApp.Models;
 
 public class OrderLine
@@ -10,5 +12,6 @@ public class OrderLine
     public int Quantity { get; set; }
     public decimal LineTotal { get; set; }
 
+    [JsonIgnore]
     public virtual Order? Order { get; set; }
 }
