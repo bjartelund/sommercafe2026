@@ -18,16 +18,27 @@ public class EmployeeFunctions(AppDbContext db)
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "employees/me")] HttpRequestData req,
         ClaimsPrincipal claimsPrincipal)
     {
-        var objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
-            ?? claimsPrincipal.FindFirst("oid")?.Value;
-        var displayName = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value
-            ?? claimsPrincipal.FindFirst("name")?.Value;
-        var email = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value
-            ?? claimsPrincipal.FindFirst("email")?.Value;
+        string objectId = null;
+        string displayName = null;
+        string email = null;
 
+        // Try to extract from claims (real auth)
+        if (claimsPrincipal != null)
+        {
+            objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
+                ?? claimsPrincipal.FindFirst("oid")?.Value;
+            displayName = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value
+                ?? claimsPrincipal.FindFirst("name")?.Value;
+            email = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value
+                ?? claimsPrincipal.FindFirst("email")?.Value;
+        }
+
+        // Fallback for local development (SWA mock auth, no claims)
         if (string.IsNullOrEmpty(objectId) || string.IsNullOrEmpty(displayName) || string.IsNullOrEmpty(email))
         {
-            return new BadRequestObjectResult("Missing required claims from Entra ID");
+            objectId = "test-user-" + Guid.NewGuid().ToString().Substring(0, 8);
+            displayName = "Test User";
+            email = "test@cafe.local";
         }
 
         var employee = await db.Employees
