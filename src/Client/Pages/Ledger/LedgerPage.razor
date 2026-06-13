@@ -12,10 +12,12 @@
 <MudPaper Class="pa-6 mb-6">
     <MudGrid>
         <MudItem xs="12" sm="6" md="3">
-            <MudDatePicker Label="From" @bind-Date="fromDate" />
+            <label>From</label>
+            <input type="date" @bind="FromDateString" class="mud-input-base mud-input mud-input-outlined" style="width: 100%; padding: 8px;" />
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
-            <MudDatePicker Label="To" @bind-Date="toDate" />
+            <label>To</label>
+            <input type="date" @bind="ToDateString" class="mud-input-base mud-input mud-input-outlined" style="width: 100%; padding: 8px;" />
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RefreshLedger" FullWidth="true">
@@ -94,15 +96,15 @@ else
 
 @code {
     private LedgerResponseData? ledger;
-    private DateTime? fromDate;
-    private DateTime? toDate;
+    private string FromDateString = "";
+    private string ToDateString = "";
     private bool loading = true;
 
     protected override async Task OnInitializedAsync()
     {
         var today = DateTime.UtcNow.Date;
-        fromDate = today.AddMonths(-3);
-        toDate = today.AddDays(1);
+        FromDateString = today.AddMonths(-3).ToString("yyyy-MM-dd");
+        ToDateString = today.AddDays(1).ToString("yyyy-MM-dd");
 
         await RefreshLedger();
     }
@@ -110,6 +112,15 @@ else
     private async Task RefreshLedger()
     {
         loading = true;
+        DateTime? fromDate = null;
+        DateTime? toDate = null;
+
+        if (DateTime.TryParseExact(FromDateString, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var from))
+            fromDate = from;
+
+        if (DateTime.TryParseExact(ToDateString, "yyyy-MM-dd", null, System.Globalization.DateTimeStyles.None, out var to))
+            toDate = to;
+
         ledger = await LedgerService.GetLedgerAsync(fromDate, toDate);
         loading = false;
     }
