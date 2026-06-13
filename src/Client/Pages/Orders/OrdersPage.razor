@@ -1,32 +1,40 @@
 @page "/orders"
 @using Client.Services
 @using Client.Pages.Orders.Components
+@using MudBlazor
 @inject ProductsService ProductsService
 @inject OrdersService OrdersService
 @inject NavigationManager Navigation
 
 <PageTitle>Record Order</PageTitle>
 
-<h1>Record a Customer Order</h1>
+<MudText Typo="Typo.h4" Class="mb-6">Record a Customer Order</MudText>
 
 @if (loading)
 {
-    <p>Loading products...</p>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    <MudText Class="mt-4">Loading products...</MudText>
 }
 else if (products.Count == 0)
 {
-    <p>No active products available.</p>
+    <MudAlert Severity="Severity.Warning" Class="mb-4">
+        No active products available. <MudLink Href="/products">Create products first.</MudLink>
+    </MudAlert>
 }
 else
 {
-    <div class="orders-container">
-        <ProductPicker Products="products" OnLineAdded="AddLine" OnLineRemoved="RemoveLine" />
+    <MudGrid>
+        <MudItem xs="12" sm="6">
+            <ProductPicker Products="products" OnLineAdded="AddLine" OnLineRemoved="RemoveLine" />
+        </MudItem>
 
         @if (selectedLines.Count > 0)
         {
-            <OrderSummary Lines="selectedLines" Products="products" OnConfirm="SubmitOrder" OnCancel="ClearOrder" />
+            <MudItem xs="12" sm="6">
+                <OrderSummary Lines="selectedLines" Products="products" OnConfirm="SubmitOrder" OnCancel="ClearOrder" />
+            </MudItem>
         }
-    </div>
+    </MudGrid>
 }
 
 @code {
@@ -78,12 +86,3 @@ else
         return Task.CompletedTask;
     }
 }
-
-<style>
-    .orders-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-</style>

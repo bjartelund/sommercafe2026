@@ -16,13 +16,13 @@
 
 ### Setup Tasks
 
-- [ ] T001 Add MudBlazor NuGet package to `src/Client/Client.csproj` (version 6.x compatible with .NET 10)
-- [ ] T002 Remove Bootstrap 5 CSS link from `src/Client/wwwroot/index.html`
-- [ ] T003 [P] Add MudBlazor script and CSS imports to `src/Client/wwwroot/index.html`
-- [ ] T004 [P] Initialize MudBlazor in `src/Client/Program.cs` with `services.AddMudServices()`
-- [ ] T005 [P] Remove Bootstrap NuGet package reference from `src/Client/Client.csproj` (if present)
-- [ ] T006 Clear `src/Client/wwwroot/css/app.css` of Bootstrap utility classes; keep only MudBlazor theme overrides (if any)
-- [ ] T007 Verify build succeeds: `dotnet build` produces no errors
+- [X] T001 Add MudBlazor NuGet package to `src/Client/Client.csproj` (version 6.x compatible with .NET 10)
+- [X] T002 Remove Bootstrap 5 CSS link from `src/Client/wwwroot/index.html`
+- [X] T003 [P] Add MudBlazor script and CSS imports to `src/Client/wwwroot/index.html`
+- [X] T004 [P] Initialize MudBlazor in `src/Client/Program.cs` with `services.AddMudServices()`
+- [X] T005 [P] Remove Bootstrap NuGet package reference from `src/Client/Client.csproj` (if present)
+- [X] T006 Clear `src/Client/wwwroot/css/app.css` of Bootstrap utility classes; keep only MudBlazor theme overrides (if any)
+- [X] T007 Verify build succeeds: `dotnet build` produces no errors
 
 ---
 
@@ -34,13 +34,13 @@
 
 ### Foundational Tasks
 
-- [ ] T008 Refactor `src/Client/Shared/MainLayout.razor` to use MudAppBar + MudDrawer instead of Bootstrap `.navbar` and `.container`
+- [X] T008 Refactor `src/Client/Shared/MainLayout.razor` to use MudAppBar + MudDrawer instead of Bootstrap `.navbar` and `.container`
   - MudAppBar with branding in Dense=true mode
   - MudDrawer for sidebar with Toggle functionality
   - MudMainContent wrapper for page content
   - Responsive drawer: Open on desktop, collapsible hamburger on mobile
 
-- [ ] T009 Refactor `src/Client/Layout/NavMenu.razor` to use MudNavMenu within MudDrawer
+- [X] T009 Refactor `src/Client/Layout/NavMenu.razor` to use MudNavMenu within MudDrawer
   - Replace `.nav` + `.nav-link` with MudNavLink components
   - Use MudIcon + text for each link (e.g., home icon + "Home")
   - Maintain current navigation targets: /, /orders, /products, /expenses, /ledger, /work-hours
@@ -61,8 +61,8 @@
 
 ### US1 Tasks
 
-- [ ] T012 [US1] Verify MudNavLink active state styling in `src/Client/Layout/NavMenu.razor` highlights current page
-- [ ] T013 [US1] [P] Test navigation on all pages: Orders, Products, Expenses, Ledger, Work Hours — visual consistency confirmed
+- [X] T012 [US1] Verify MudNavLink active state styling in `src/Client/Layout/NavMenu.razor` highlights current page
+- [X] T013 [US1] [P] Test navigation on all pages: Orders, Products, Expenses, Ledger, Work Hours — visual consistency confirmed
 
 ---
 
@@ -76,38 +76,38 @@
 
 ### US2 Tasks — Orders Page
 
-- [ ] T014 [US2] Refactor `src/Client/Pages/Orders/OrdersPage.razor` to use MudBlazor components
+- [X] T014 [US2] Refactor `src/Client/Pages/Orders/OrdersPage.razor` to use MudBlazor components
   - Replace ProductPicker section with MudCard + MudBlazor inputs
   - Replace OrderSummary with MudTable or MudList for line items
   - Use MudButton for "Record Order" action
 
-- [ ] T015 [US2] [P] Refactor `src/Client/Pages/Orders/Components/ProductPicker.razor` to use MudTable or MudList
+- [X] T015 [US2] [P] Refactor `src/Client/Pages/Orders/Components/ProductPicker.razor` to use MudTable or MudList
   - Each product as a MudTableRow or MudListItem
   - Product name, price in columns
   - MudNumericField for quantity input
   - MudButton with "Add" action
 
-- [ ] T016 [US2] [P] Refactor `src/Client/Pages/Orders/Components/OrderSummary.razor` to use MudTable + MudButton
+- [X] T016 [US2] [P] Refactor `src/Client/Pages/Orders/Components/OrderSummary.razor` to use MudTable + MudButton
   - Line items in MudTable
   - Running total in MudPaper card with bold typography
   - MudButton for "Confirm" and "Cancel" actions (Variant=Filled for primary)
 
 ### US2 Tasks — Products Page
 
-- [ ] T017 [US2] Refactor `src/Client/Pages/Products/ProductsPage.razor` to use MudTable
+- [X] T017 [US2] Refactor `src/Client/Pages/Products/ProductsPage.razor` to use MudTable
   - Columns: Name, Price, Status, Actions
   - Use MudChip for status badges (green=Active, red=Inactive)
   - MudButton for Edit, Deactivate, History actions
   - "Add Product" button above table (MudButton Variant=Filled)
 
-- [ ] T018 [US2] [P] Refactor `src/Client/Pages/Products/Components/ProductForm.razor` to use MudDialog + MudTextField
+- [X] T018 [US2] [P] Refactor `src/Client/Pages/Products/Components/ProductForm.razor` to use MudDialog + MudTextField
   - MudDialog wrapping form inputs
   - MudTextField for product name
   - MudNumericField for price
   - MudButton for Save/Cancel (primary/secondary variant)
   - Error state: Use MudField HelperText property for validation messages
 
-- [ ] T019 [US2] [P] Refactor `src/Client/Pages/Products/Components/PriceHistory.razor` to use MudTable
+- [X] T019 [US2] [P] Refactor `src/Client/Pages/Products/Components/PriceHistory.razor` to use MudTable
   - Columns: Price, Valid From, Valid Until
   - MudTable with rows from temporal table query
   - Sorted by SysStartTime descending
