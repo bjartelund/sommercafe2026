@@ -2,6 +2,7 @@
 @using Client.Services
 @using Client.Pages.Products.Components
 @using MudBlazor
+@inject EmployeeService EmployeeService
 @inject ProductsService ProductsService
 
 <PageTitle>Manage Products</PageTitle>
@@ -82,6 +83,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            // Ensure employee record exists
+            await EmployeeService.GetOrCreateEmployeeAsync();
+        }
+        catch
+        {
+            // Continue even if employee creation fails
+        }
+
         await LoadProducts();
     }
 

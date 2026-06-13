@@ -2,6 +2,7 @@
 @using Client.Services
 @using Client.Pages.Orders.Components
 @using MudBlazor
+@inject EmployeeService EmployeeService
 @inject ProductsService ProductsService
 @inject OrdersService OrdersService
 @inject NavigationManager Navigation
@@ -44,6 +45,16 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        try
+        {
+            // Ensure employee record exists
+            await EmployeeService.GetOrCreateEmployeeAsync();
+        }
+        catch
+        {
+            // Continue even if employee creation fails
+        }
+
         products = await ProductsService.GetActiveProductsAsync();
         loading = false;
     }
