@@ -1,0 +1,167 @@
+@using Client.Services
+
+<div class="order-summary">
+    <h2>Order Summary</h2>
+    <div class="summary-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Unit Price</th>
+                    <th>Qty</th>
+                    <th>Total</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var line in Lines)
+                {
+                    var product = Products.FirstOrDefault(p => p.Id == line.ProductId);
+                    if (product != null)
+                    {
+                        var lineTotal = product.Price * line.Quantity;
+                        <tr>
+                            <td>@product.Name</td>
+                            <td>€@product.Price.ToString("0.00")</td>
+                            <td>@line.Quantity</td>
+                            <td>€@lineTotal.ToString("0.00")</td>
+                            <td>
+                                <button class="btn-remove" @onclick="@(() => OnLineRemoved.InvokeAsync(line.ProductId))">Remove</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="totals">
+        <h3>Grand Total: €@GetTotal().ToString("0.00")</h3>
+    </div>
+
+    <div class="actions">
+        <button class="btn-confirm" @onclick="OnConfirm">Confirm Order</button>
+        <button class="btn-cancel" @onclick="OnCancel">Cancel</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public List<(int ProductId, int Quantity)> Lines { get; set; } = new();
+
+    [Parameter]
+    public List<ProductResponse> Products { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnLineRemoved { get; set; }
+
+    private decimal GetTotal()
+    {
+        return Lines.Sum(l =>
+        {
+            var product = Products.FirstOrDefault(p => p.Id == l.ProductId);
+            return product?.Price * l.Quantity ?? 0;
+        });
+    }
+}
+
+<style>
+    .order-summary {
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background: #f9f9f9;
+    }
+
+    .order-summary h2 {
+        margin-top: 0;
+    }
+
+    .summary-table {
+        overflow-x: auto;
+        margin: 1rem 0;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background: #f5f5f5;
+        font-weight: bold;
+    }
+
+    .totals {
+        text-align: right;
+        padding: 1rem 0;
+        border-top: 2px solid #ddd;
+        margin-top: 1rem;
+    }
+
+    .totals h3 {
+        margin: 0;
+        color: #007bff;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn-confirm, .btn-cancel {
+        flex: 1;
+        min-height: 44px;
+        padding: 0.75rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+
+    .btn-confirm {
+        background: #28a745;
+        color: white;
+    }
+
+    .btn-confirm:hover {
+        background: #218838;
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+    }
+
+    .btn-remove {
+        padding: 0.25rem 0.75rem;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.875rem;
+    }
+
+    .btn-remove:hover {
+        background: #c82333;
+    }
+</style>

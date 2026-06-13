@@ -1,0 +1,89 @@
+@page "/orders"
+@using Client.Services
+@using Client.Pages.Orders.Components
+@inject ProductsService ProductsService
+@inject OrdersService OrdersService
+@inject NavigationManager Navigation
+
+<PageTitle>Record Order</PageTitle>
+
+<h1>Record a Customer Order</h1>
+
+@if (loading)
+{
+    <p>Loading products...</p>
+}
+else if (products.Count == 0)
+{
+    <p>No active products available.</p>
+}
+else
+{
+    <div class="orders-container">
+        <ProductPicker Products="products" OnLineAdded="AddLine" OnLineRemoved="RemoveLine" />
+
+        @if (selectedLines.Count > 0)
+        {
+            <OrderSummary Lines="selectedLines" Products="products" OnConfirm="SubmitOrder" OnCancel="ClearOrder" />
+        }
+    </div>
+}
+
+@code {
+    private List<ProductResponse> products = new();
+    private List<(int ProductId, int Quantity)> selectedLines = new();
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductsService.GetActiveProductsAsync();
+        loading = false;
+    }
+
+    private Task AddLine((int ProductId, int Quantity) line)
+    {
+        var existing = selectedLines.FirstOrDefault(l => l.ProductId == line.ProductId);
+        if (existing != default)
+        {
+            selectedLines.Remove(existing);
+            selectedLines.Add((existing.ProductId, existing.Quantity + line.Quantity));
+        }
+        else
+        {
+            selectedLines.Add(line);
+        }
+        return Task.CompletedTask;
+    }
+
+    private Task RemoveLine(int productId)
+    {
+        selectedLines.RemoveAll(l => l.ProductId == productId);
+        return Task.CompletedTask;
+    }
+
+    private async Task SubmitOrder()
+    {
+        var result = await OrdersService.CreateOrderAsync(selectedLines);
+        if (result != null)
+        {
+            selectedLines.Clear();
+            await Task.Delay(500);
+            Navigation.NavigateTo("/orders");
+        }
+    }
+
+    private Task ClearOrder()
+    {
+        selectedLines.Clear();
+        return Task.CompletedTask;
+    }
+}
+
+<style>
+    .orders-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+</style>

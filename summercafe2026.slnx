@@ -3,4 +3,5 @@
     <Project Path="src/Client/Client.csproj" />
   </Folder>
   <Project Path="api/api.csproj" />
+  <Project Path="tests/CafeApp.Tests.csproj" />
 </Solution>
