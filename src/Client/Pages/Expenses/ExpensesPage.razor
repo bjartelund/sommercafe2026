@@ -86,7 +86,7 @@ else
             { "IsEdit", true },
             { "InitialDescription", expense.Description },
             { "InitialAmount", expense.Amount },
-            { "InitialDate", expense.ExpenseDate }
+            { "InitialDate", expense.ExpenseDate.ToString("yyyy-MM-dd") }
         };
 
         var dialog = await DialogService.ShowAsync<ExpenseForm>("", parameters);

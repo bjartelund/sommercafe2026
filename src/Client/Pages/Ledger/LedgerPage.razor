@@ -13,11 +13,11 @@
     <MudGrid>
         <MudItem xs="12" sm="6" md="3">
             <label>From</label>
-            <input type="date" @bind="FromDateString" class="mud-input-base mud-input mud-input-outlined" style="width: 100%; padding: 8px;" />
+            <input type="date" value="@FromDateString" @onchange="(ChangeEventArgs e) => FromDateString = e.Value?.ToString() ?? string.Empty" class="mud-input-base mud-input mud-input-outlined" style="width: 100%; padding: 8px;" />
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <label>To</label>
-            <input type="date" @bind="ToDateString" class="mud-input-base mud-input mud-input-outlined" style="width: 100%; padding: 8px;" />
+            <input type="date" value="@ToDateString" @onchange="(ChangeEventArgs e) => ToDateString = e.Value?.ToString() ?? string.Empty" class="mud-input-base mud-input mud-input-outlined" style="width: 100%; padding: 8px;" />
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="RefreshLedger" FullWidth="true">

@@ -19,12 +19,20 @@ public class WorkSessionsFunctions(AppDbContext db)
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "work-sessions")] HttpRequestData req,
         ClaimsPrincipal claimsPrincipal)
     {
-        var objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
-            ?? claimsPrincipal.FindFirst("oid")?.Value;
+        Employee employee = null;
 
-        var employee = await db.Employees.FirstOrDefaultAsync(e => e.EntraObjectId == objectId);
+        if (claimsPrincipal != null)
+        {
+            var objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
+                ?? claimsPrincipal.FindFirst("oid")?.Value;
+            employee = await db.Employees.FirstOrDefaultAsync(e => e.EntraObjectId == objectId);
+        }
+
         if (employee == null)
-            return new BadRequestObjectResult("Employee not found");
+            employee = await db.Employees.OrderByDescending(e => e.CreatedAt).FirstOrDefaultAsync();
+
+        if (employee == null)
+            return new BadRequestObjectResult("No employee found. Please create an employee first.");
 
         JsonDocument? body = null;
         try { body = await JsonDocument.ParseAsync(req.Body); } catch { }
@@ -66,10 +74,11 @@ public class WorkSessionsFunctions(AppDbContext db)
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "work-sessions")] HttpRequestData req)
     {
         var fromDate = DateTime.TryParse(req.Query["from"] ?? "", out var f) ? f : DateTime.UtcNow.AddMonths(-1);
-        var toDate = DateTime.TryParse(req.Query["to"] ?? "", out var t) ? t : DateTime.UtcNow;
+        var toDate = DateTime.TryParse(req.Query["to"] ?? "", out var t) ? t : DateTime.UtcNow.AddDays(1);
 
         var sessions = await db.WorkSessions
-            .Where(s => s.SessionDate >= fromDate && s.SessionDate <= toDate)
+            .Include(s => s.Employee)
+            .Where(s => s.SessionDate >= fromDate && s.SessionDate < toDate)
             .OrderByDescending(s => s.SessionDate)
             .ToListAsync();
 

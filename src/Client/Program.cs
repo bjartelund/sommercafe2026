@@ -19,5 +19,6 @@ builder.Services.AddScoped<ProductsService>();
 builder.Services.AddScoped<OrdersService>();
 builder.Services.AddScoped<LedgerService>();
 builder.Services.AddScoped<ExpensesService>();
+builder.Services.AddScoped<WorkSessionsService>();
 
 await builder.Build().RunAsync();

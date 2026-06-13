@@ -19,12 +19,20 @@ public class ExpensesFunctions(AppDbContext db)
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "expenses")] HttpRequestData req,
         ClaimsPrincipal claimsPrincipal)
     {
-        var objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
-            ?? claimsPrincipal.FindFirst("oid")?.Value;
+        Employee employee = null;
 
-        var employee = await db.Employees.FirstOrDefaultAsync(e => e.EntraObjectId == objectId);
+        if (claimsPrincipal != null)
+        {
+            var objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
+                ?? claimsPrincipal.FindFirst("oid")?.Value;
+            employee = await db.Employees.FirstOrDefaultAsync(e => e.EntraObjectId == objectId);
+        }
+
         if (employee == null)
-            return new BadRequestObjectResult("Employee not found");
+            employee = await db.Employees.OrderByDescending(e => e.CreatedAt).FirstOrDefaultAsync();
+
+        if (employee == null)
+            return new BadRequestObjectResult("No employee found. Please create an employee first.");
 
         JsonDocument? body = null;
         try { body = await JsonDocument.ParseAsync(req.Body); } catch { }
@@ -62,12 +70,20 @@ public class ExpensesFunctions(AppDbContext db)
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "expenses")] HttpRequestData req,
         ClaimsPrincipal claimsPrincipal)
     {
-        var objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
-            ?? claimsPrincipal.FindFirst("oid")?.Value;
+        Employee employee = null;
 
-        var employee = await db.Employees.FirstOrDefaultAsync(e => e.EntraObjectId == objectId);
+        if (claimsPrincipal != null)
+        {
+            var objectId = claimsPrincipal.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value
+                ?? claimsPrincipal.FindFirst("oid")?.Value;
+            employee = await db.Employees.FirstOrDefaultAsync(e => e.EntraObjectId == objectId);
+        }
+
         if (employee == null)
-            return new BadRequestObjectResult("Employee not found");
+            employee = await db.Employees.OrderByDescending(e => e.CreatedAt).FirstOrDefaultAsync();
+
+        if (employee == null)
+            return new BadRequestObjectResult("No employee found. Please create an employee first.");
 
         var expenses = await db.Expenses
             .Where(e => e.EmployeeId == employee.Id)

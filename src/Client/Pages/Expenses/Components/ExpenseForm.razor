@@ -8,7 +8,8 @@
         <MudStack Spacing="3">
             <MudTextField @bind-Value="Description" Label="Description" Variant="Variant.Outlined" Required="true" />
             <MudNumericField @bind-Value="Amount" Label="Amount" Variant="Variant.Outlined" Format="C2" Min="0.01m" Required="true" />
-            <input type="date" @bind="DateString" max="@DateTime.UtcNow.Date.ToString("yyyy-MM-dd")" class="mud-input-base mud-input mud-input-outlined" />
+            <label>Date</label>
+            <input type="date" value="@DateString" @onchange="(ChangeEventArgs e) => DateString = e.Value?.ToString() ?? string.Empty" max="@DateTime.UtcNow.Date.ToString("yyyy-MM-dd")" class="mud-input-base mud-input mud-input-outlined" />
         </MudStack>
     </DialogContent>
     <DialogActions>
@@ -30,7 +31,7 @@
     public decimal InitialAmount { get; set; }
 
     [Parameter]
-    public DateTime? InitialDate { get; set; }
+    public string? InitialDate { get; set; }
 
     [Parameter]
     public bool IsEdit { get; set; }
@@ -43,10 +44,7 @@
     {
         Description = InitialDescription;
         Amount = InitialAmount;
-        if (InitialDate.HasValue)
-        {
-            DateString = InitialDate.Value.ToString("yyyy-MM-dd");
-        }
+        DateString = InitialDate ?? DateTime.UtcNow.Date.ToString("yyyy-MM-dd");
     }
 
     private bool IsValid => !string.IsNullOrWhiteSpace(Description) && Amount > 0 && !string.IsNullOrWhiteSpace(DateString);
