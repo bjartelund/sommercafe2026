@@ -51,12 +51,8 @@
         loading = true;
         try
         {
-            var response = await HttpClient.GetAsync($"/api/products/{ProductId}/price-history");
-            if (response.IsSuccessStatusCode)
-            {
-                var entries = await response.Content.ReadAsAsync<List<PriceHistoryEntry>>();
-                historyEntries = entries ?? new();
-            }
+            var entries = await HttpClient.GetFromJsonAsync<List<PriceHistoryEntry>>($"/api/products/{ProductId}/price-history");
+            historyEntries = entries ?? new();
         }
         catch
         {
