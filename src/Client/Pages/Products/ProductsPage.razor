@@ -1,0 +1,195 @@
+@page "/products"
+@using Client.Services
+@using Client.Pages.Products.Components
+@inject ProductsService ProductsService
+
+<PageTitle>Manage Products</PageTitle>
+
+<h1>Product Catalogue</h1>
+
+<button class="btn btn-primary mb-3" @onclick="OpenAddForm">Add Product</button>
+
+@if (loading)
+{
+    <p>Loading products...</p>
+}
+else if (allProducts.Count == 0)
+{
+    <p>No products yet. <a href="#" @onclick="OpenAddForm" @onclick:preventDefault>Add one</a>.</p>
+}
+else
+{
+    <div class="products-table">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in allProducts)
+                {
+                    <tr class="@(product.IsActive ? "" : "table-secondary")">
+                        <td>@product.Name</td>
+                        <td>@product.Price.ToString("C")</td>
+                        <td>
+                            @if (product.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" @onclick="() => OpenEditForm(product)" style="min-width: 44px; min-height: 44px;">
+                                Edit
+                            </button>
+                            <button class="btn btn-sm @(product.IsActive ? "btn-outline-danger" : "btn-outline-success")"
+                                    @onclick="() => ToggleActive(product)" style="min-width: 44px; min-height: 44px;">
+                                @(product.IsActive ? "Deactivate" : "Reactivate")
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => ShowHistory(product)" style="min-width: 44px; min-height: 44px;">
+                                History
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@if (showForm)
+{
+    <ProductForm Product="editingProduct" OnSave="SaveProduct" OnCancel="CloseForm" />
+}
+
+@if (showHistory)
+{
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Price History: @historyProduct?.Name</h5>
+                    <button type="button" class="btn-close" @onclick="() => showHistory = false"></button>
+                </div>
+                <div class="modal-body">
+                    @if (historyProduct != null)
+                    {
+                        <PriceHistory ProductId="historyProduct.Id" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<ProductResponse> allProducts = new();
+    private ProductResponse? editingProduct;
+    private ProductResponse? historyProduct;
+    private bool loading = true;
+    private bool showForm = false;
+    private bool showHistory = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+
+    private async Task LoadProducts()
+    {
+        loading = true;
+        var active = await ProductsService.GetActiveProductsAsync();
+
+        // TODO: Also load inactive products when API supports it
+        // For now, we'll show all products passed from the list
+        allProducts = active;
+        loading = false;
+    }
+
+    private void OpenAddForm()
+    {
+        editingProduct = null;
+        showForm = true;
+    }
+
+    private void OpenEditForm(ProductResponse product)
+    {
+        editingProduct = product;
+        showForm = true;
+    }
+
+    private void CloseForm()
+    {
+        showForm = false;
+        editingProduct = null;
+    }
+
+    private async Task SaveProduct(ProductResponse product)
+    {
+        if (editingProduct == null)
+        {
+            // Create new
+            var result = await ProductsService.CreateProductAsync(product.Name ?? "", product.Price);
+            if (result != null)
+            {
+                allProducts.Add(result);
+            }
+        }
+        else
+        {
+            // Update price
+            var result = await ProductsService.UpdateProductAsync(editingProduct.Id, product.Price, null);
+            if (result != null)
+            {
+                var index = allProducts.FindIndex(p => p.Id == result.Id);
+                if (index >= 0)
+                {
+                    allProducts[index] = result;
+                }
+            }
+        }
+
+        CloseForm();
+    }
+
+    private async Task ToggleActive(ProductResponse product)
+    {
+        var result = await ProductsService.UpdateProductAsync(product.Id, null, !product.IsActive);
+        if (result != null)
+        {
+            var index = allProducts.FindIndex(p => p.Id == result.Id);
+            if (index >= 0)
+            {
+                allProducts[index] = result;
+            }
+        }
+    }
+
+    private void ShowHistory(ProductResponse product)
+    {
+        historyProduct = product;
+        showHistory = true;
+    }
+}
+
+<style>
+    .products-table {
+        margin-top: 2rem;
+    }
+
+    .modal.d-block {
+        display: block !important;
+    }
+
+    .modal-backdrop.show {
+        opacity: 0.5;
+    }
+</style>

@@ -102,4 +102,24 @@ public class ProductsFunctions(AppDbContext db)
         await db.SaveChangesAsync();
         return new OkObjectResult(product);
     }
+
+    [Authorize]
+    [Function("GetProductPriceHistory")]
+    public async Task<IActionResult> GetProductPriceHistory(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "products/{id}/price-history")] HttpRequestData req,
+        int id)
+    {
+        var product = await db.Products.FindAsync(id);
+        if (product == null)
+            return new NotFoundResult();
+
+        var history = await db.Products
+            .TemporalAll()
+            .Where(p => p.Id == id)
+            .OrderByDescending(p => p.SysStartTime)
+            .Select(p => new { p.Price, p.SysStartTime, p.SysEndTime })
+            .ToListAsync();
+
+        return new OkObjectResult(history);
+    }
 }

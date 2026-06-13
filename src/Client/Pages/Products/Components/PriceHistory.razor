@@ -1,0 +1,84 @@
+@using System.Net.Http.Json
+@inject HttpClient HttpClient
+
+<div class="price-history">
+    @if (loading)
+    {
+        <p>Loading price history...</p>
+    }
+    else if (historyEntries.Count == 0)
+    {
+        <p>No price history available.</p>
+    }
+    else
+    {
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Price</th>
+                    <th>Valid From</th>
+                    <th>Valid Until</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var entry in historyEntries.OrderByDescending(h => h.SysStartTime))
+                {
+                    <tr>
+                        <td>@entry.Price.ToString("C")</td>
+                        <td>@entry.SysStartTime.ToString("g")</td>
+                        <td>@(entry.SysEndTime == DateTime.MaxValue ? "Current" : entry.SysEndTime.ToString("g"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private List<PriceHistoryEntry> historyEntries = new();
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPriceHistory();
+    }
+
+    private async Task LoadPriceHistory()
+    {
+        loading = true;
+        try
+        {
+            var response = await HttpClient.GetAsync($"/api/products/{ProductId}/price-history");
+            if (response.IsSuccessStatusCode)
+            {
+                var entries = await response.Content.ReadAsAsync<List<PriceHistoryEntry>>();
+                historyEntries = entries ?? new();
+            }
+        }
+        catch
+        {
+            // Silently fail for now
+        }
+        loading = false;
+    }
+
+    private class PriceHistoryEntry
+    {
+        public decimal Price { get; set; }
+        public DateTime SysStartTime { get; set; }
+        public DateTime SysEndTime { get; set; }
+    }
+}
+
+<style>
+    .price-history {
+        padding: 1rem;
+    }
+
+    .price-history table {
+        margin-top: 1rem;
+    }
+</style>

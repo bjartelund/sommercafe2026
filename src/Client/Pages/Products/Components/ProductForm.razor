@@ -1,0 +1,104 @@
+@using Client.Services
+
+<div class="modal-backdrop fade show"></div>
+<div class="modal fade show d-block">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@(Product == null ? "Add Product" : "Edit Price")</h5>
+                <button type="button" class="btn-close" @onclick="OnCancel"></button>
+            </div>
+            <div class="modal-body">
+                <form @onsubmit="HandleSubmit">
+                    @if (Product == null)
+                    {
+                        <div class="mb-3">
+                            <label for="productName" class="form-label">Product Name</label>
+                            <input type="text" class="form-control" id="productName"
+                                   @bind="formName" placeholder="e.g., Coffee" required />
+                        </div>
+                    }
+
+                    <div class="mb-3">
+                        <label for="productPrice" class="form-label">Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="number" class="form-control" id="productPrice"
+                                   @bind="formPrice" step="0.01" min="0.01" required />
+                        </div>
+                        @if (formPrice <= 0)
+                        {
+                            <div class="invalid-feedback d-block">
+                                Price must be greater than 0
+                            </div>
+                        }
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="OnCancel">Cancel</button>
+                        <button type="submit" class="btn btn-primary" disabled="@(string.IsNullOrWhiteSpace(formName) && Product == null || formPrice <= 0)">
+                            @(Product == null ? "Add" : "Update Price")
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ProductResponse? Product { get; set; }
+
+    [Parameter]
+    public EventCallback<ProductResponse> OnSave { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    private string formName = "";
+    private decimal formPrice = 0;
+
+    protected override void OnParametersSet()
+    {
+        if (Product != null)
+        {
+            formName = Product.Name ?? "";
+            formPrice = Product.Price;
+        }
+        else
+        {
+            formName = "";
+            formPrice = 0;
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        if (string.IsNullOrWhiteSpace(formName) && Product == null)
+            return;
+        if (formPrice <= 0)
+            return;
+
+        var newProduct = new ProductResponse
+        {
+            Id = Product?.Id ?? 0,
+            Name = formName,
+            Price = formPrice,
+            IsActive = Product?.IsActive ?? true,
+            CreatedAt = Product?.CreatedAt ?? DateTime.UtcNow
+        };
+
+        await OnSave.InvokeAsync(newProduct);
+    }
+}
+
+<style>
+    .modal.d-block {
+        display: block !important;
+    }
+
+    .modal-backdrop.show {
+        opacity: 0.5;
+    }
+</style>
