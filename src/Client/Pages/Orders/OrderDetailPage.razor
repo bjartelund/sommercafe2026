@@ -31,7 +31,7 @@ else
             </MudItem>
             <MudItem xs="12" sm="6">
                 <MudText Typo="Typo.subtitle2">Total Amount</MudText>
-                <MudText Typo="Typo.body1">@order.TotalAmount.ToString("C")</MudText>
+                <MudText Typo="Typo.body1">@($"{order.TotalAmount:N2} kr")</MudText>
             </MudItem>
             @if (!string.IsNullOrEmpty(order.Notes))
             {
@@ -54,9 +54,9 @@ else
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.ProductName</MudTd>
-                <MudTd Align="Align.Right">@context.UnitPrice.ToString("C")</MudTd>
+                <MudTd Align="Align.Right">@($"{context.UnitPrice:N2} kr")</MudTd>
                 <MudTd Align="Align.Right">@context.Quantity</MudTd>
-                <MudTd Align="Align.Right">@context.LineTotal.ToString("C")</MudTd>
+                <MudTd Align="Align.Right">@($"{context.LineTotal:N2} kr")</MudTd>
             </RowTemplate>
         </MudTable>
     </MudPaper>

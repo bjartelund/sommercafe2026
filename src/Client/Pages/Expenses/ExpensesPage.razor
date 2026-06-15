@@ -35,7 +35,7 @@ else
             <RowTemplate>
                 <MudTd>@context.ExpenseDate.ToString("MMM dd, yyyy")</MudTd>
                 <MudTd>@context.Description</MudTd>
-                <MudTd Align="Align.Right">@context.Amount.ToString("C")</MudTd>
+                <MudTd Align="Align.Right">@context.Amount.ToString("N2") kr</MudTd>
                 <MudTd Align="Align.Right">
                     <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small" OnClick="() => OpenEditDialog(context)" />
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" Size="Size.Small" Color="Color.Error" OnClick="() => ConfirmDelete(context)" />

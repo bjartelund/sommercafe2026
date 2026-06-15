@@ -20,7 +20,7 @@ else
             <MudTh>Valid Until</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd Align="Align.Right">@context.Price.ToString("C")</MudTd>
+            <MudTd Align="Align.Right">@context.Price.ToString("N2") kr</MudTd>
             <MudTd>@context.SysStartTime.ToString("g")</MudTd>
             <MudTd>@(context.SysEndTime == DateTime.MaxValue ? "Current" : context.SysEndTime.ToString("g"))</MudTd>
         </RowTemplate>

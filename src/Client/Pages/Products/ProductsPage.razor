@@ -34,7 +34,7 @@ else
         </HeaderContent>
         <RowTemplate>
             <MudTd>@context.Name</MudTd>
-            <MudTd Align="Align.Right">@context.Price.ToString("C")</MudTd>
+            <MudTd Align="Align.Right">@context.Price.ToString("N2") kr</MudTd>
             <MudTd>
                 @if (context.IsActive)
                 {

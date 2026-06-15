@@ -42,20 +42,20 @@ else
         <MudItem xs="12" sm="4">
             <MudPaper Class="pa-4">
                 <MudText Typo="Typo.subtitle1">Total Revenue</MudText>
-                <MudText Typo="Typo.h5" Color="Color.Success">@ledger.TotalRevenue.ToString("C")</MudText>
+                <MudText Typo="Typo.h5" Color="Color.Success">@($"{ledger.TotalRevenue:N2} kr")</MudText>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="4">
             <MudPaper Class="pa-4">
                 <MudText Typo="Typo.subtitle1">Total Expenses</MudText>
-                <MudText Typo="Typo.h5" Color="Color.Error">@ledger.TotalExpenses.ToString("C")</MudText>
+                <MudText Typo="Typo.h5" Color="Color.Error">@($"{ledger.TotalExpenses:N2} kr")</MudText>
             </MudPaper>
         </MudItem>
         <MudItem xs="12" sm="4">
             <MudPaper Class="pa-4">
                 <MudText Typo="Typo.subtitle1">Net Balance</MudText>
                 <MudText Typo="Typo.h5" Color="@(ledger.NetBalance >= 0 ? Color.Success : Color.Error)">
-                    @ledger.NetBalance.ToString("C")
+                    @($"{ledger.NetBalance:N2} kr")
                 </MudText>
             </MudPaper>
         </MudItem>
@@ -81,7 +81,7 @@ else
                 </MudTd>
                 <MudTd Align="Align.Right" Style="cursor: pointer;" @onclick="() => OnEntryClick(context)">
                     <MudText Color="@(context.Amount > 0 ? Color.Success : Color.Error)">
-                        @(context.Amount > 0 ? "+" : "")@context.Amount.ToString("C")
+                        @($"{(context.Amount > 0 ? "+" : "")}{context.Amount:N2} kr")
                     </MudText>
                 </MudTd>
             </RowTemplate>

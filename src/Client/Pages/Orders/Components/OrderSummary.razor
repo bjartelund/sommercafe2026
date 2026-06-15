@@ -22,9 +22,9 @@
                         var lineTotal = product.Price * context.Quantity;
                         <MudTr>
                             <MudTd>@product.Name</MudTd>
-                            <MudTd Align="Align.Right">@product.Price.ToString("C")</MudTd>
+                            <MudTd Align="Align.Right">@($"{product.Price:N2} kr")</MudTd>
                             <MudTd Align="Align.Right">@context.Quantity</MudTd>
-                            <MudTd Align="Align.Right"><strong>@lineTotal.ToString("C")</strong></MudTd>
+                            <MudTd Align="Align.Right"><strong>@($"{lineTotal:N2} kr")</strong></MudTd>
                             <MudTd Align="Align.Center">
                                 <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                               Size="Size.Small"
@@ -39,7 +39,7 @@
 
         <MudPaper Class="pa-4 mb-4" Outlined="true">
             <MudText Typo="Typo.h5" Align="Align.Right">
-                Grand Total: <MudText Component="span" Color="Color.Primary"><strong>@GetTotal().ToString("C")</strong></MudText>
+                Grand Total: <MudText Component="span" Color="Color.Primary"><strong>@($"{GetTotal():N2} kr")</strong></MudText>
             </MudText>
         </MudPaper>
 
