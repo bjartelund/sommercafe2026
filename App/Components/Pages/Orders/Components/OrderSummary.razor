@@ -1,0 +1,81 @@
+@using BlazorApp1.Services
+@using MudBlazor
+
+<MudCard>
+    <MudCardHeader>
+        <MudText Typo="Typo.h6">Order Summary</MudText>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTable Items="Lines" Striped="true" Bordered="true" Dense="true" Class="mb-4">
+            <HeaderContent>
+                <MudTh>Product</MudTh>
+                <MudTh Align="Align.Right">Unit Price</MudTh>
+                <MudTh Align="Align.Right">Qty</MudTh>
+                <MudTh Align="Align.Right">Total</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                @{
+                    var product = Products.FirstOrDefault(p => p.Id == context.ProductId);
+                    if (product != null)
+                    {
+                        var lineTotal = product.Price * context.Quantity;
+                        <MudTr>
+                            <MudTd>@product.Name</MudTd>
+                            <MudTd Align="Align.Right">@($"{product.Price:N2} kr")</MudTd>
+                            <MudTd Align="Align.Right">@context.Quantity</MudTd>
+                            <MudTd Align="Align.Right"><strong>@($"{lineTotal:N2} kr")</strong></MudTd>
+                            <MudTd Align="Align.Center">
+                                <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                              Size="Size.Small"
+                                              Color="Color.Error"
+                                              OnClick="@(() => OnLineRemoved.InvokeAsync(context.ProductId))" />
+                            </MudTd>
+                        </MudTr>
+                    }
+                }
+            </RowTemplate>
+        </MudTable>
+
+        <MudPaper Class="pa-4 mb-4" Outlined="true">
+            <MudText Typo="Typo.h5" Align="Align.Right">
+                Grand Total: <MudText Component="span" Color="Color.Primary"><strong>@($"{GetTotal():N2} kr")</strong></MudText>
+            </MudText>
+        </MudPaper>
+
+        <MudStack Row="true" Spacing="2">
+            <MudButton Variant="Variant.Filled" Color="Color.Success" Size="Size.Large" OnClick="OnConfirm" FullWidth="true">
+                Confirm Order
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" Color="Color.Default" Size="Size.Large" OnClick="OnCancel" FullWidth="true">
+                Cancel
+            </MudButton>
+        </MudStack>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter]
+    public List<(int ProductId, int Quantity)> Lines { get; set; } = new();
+
+    [Parameter]
+    public List<ProductResponse> Products { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnConfirm { get; set; }
+
+    [Parameter]
+    public EventCallback OnCancel { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnLineRemoved { get; set; }
+
+    private decimal GetTotal()
+    {
+        return Lines.Sum(l =>
+        {
+            var product = Products.FirstOrDefault(p => p.Id == l.ProductId);
+            return product?.Price * l.Quantity ?? 0;
+        });
+    }
+}
