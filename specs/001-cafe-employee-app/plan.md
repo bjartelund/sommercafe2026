@@ -6,33 +6,29 @@
 
 ## Summary
 
-A mobile-responsive, employee-only web application for a small café. Employees log in via
-Microsoft Entra ID and can record customer orders, manage the product catalogue, track expenses,
-view a financial ledger, and log work hours. The backend is Azure Functions (dotnet isolated)
-backed by Azure SQL; the frontend is Blazor WebAssembly hosted on Azure Static Web Apps.
-Product price history is preserved automatically using Azure SQL temporal tables.
+A mobile-responsive employee web application for a small café. Employees can record customer
+orders, manage the product catalogue, track expenses, view a financial ledger, and log work
+hours. The application now runs as a standalone Blazor Server app backed by SQL Server, with
+product price history preserved automatically using temporal tables.
 
 ## Technical Context
 
-**Language/Version**: C# 13 / .NET 10 (Blazor WASM client); C# 12 / .NET 8 (Azure Functions API)
+**Language/Version**: C# 13 / .NET 10
 
 **Primary Dependencies**:
-- `Microsoft.AspNetCore.Components.WebAssembly` 10.x — Blazor WASM host
-- `Microsoft.Authentication.WebAssembly.Msal` — MSAL/Entra ID auth in browser
-- `Microsoft.Identity.Web` — token validation in Azure Functions
+- `Microsoft.AspNetCore.Components` / Blazor Server — server-rendered interactive UI
 - `Microsoft.EntityFrameworkCore.SqlServer` — EF Core + Azure SQL
-- `Microsoft.Azure.Functions.Worker` — Functions host (already in project)
-- `OpenTelemetry.*` — observability (already wired in api/Program.cs)
+- `MudBlazor` — component library for the UI
 
 **Storage**: Azure SQL Database; Product table uses system-versioned temporal table for
 automatic price history. All other tables are standard.
 
 **Testing**: TUnit for both unit tests (pure logic) and integration tests (Testcontainers + Azure SQL). Blazor component tests (bunit) and E2E are out of scope.
 
-**Target Platform**: Azure Static Web Apps (WASM + Functions); mobile browsers (iOS Safari,
-Android Chrome) as primary client surface
+**Target Platform**: Standalone ASP.NET Core / Blazor Server deployment; mobile browsers (iOS
+Safari, Android Chrome) as primary client surface
 
-**Project Type**: Employee-facing SPA (Blazor WASM) with REST API backend (Azure Functions)
+**Project Type**: Employee-facing server-rendered interactive web app (Blazor Server)
 
 **Performance Goals**: All pages fully interactive within 3 seconds on a 4G mobile connection;
 order submission round-trip under 2 seconds
@@ -49,8 +45,8 @@ single-location café
 
 | Principle | Status | Notes |
 |-----------|--------|-------|
-| I. Azure-Native Architecture | ✅ PASS | Blazor WASM on Azure SWA, Azure Functions backend, Azure SQL, Entra ID — all Azure-native |
-| II. API-Driven Data Access | ✅ PASS | Blazor client communicates only via Azure Functions HTTP endpoints; no direct DB access from WASM |
+| I. Azure-Native Architecture | ✅ PASS | ASP.NET Core Blazor Server app with SQL Server remains deployable on Azure App Service |
+| II. API-Driven Data Access | ✅ PASS | Data access is centralized in injected server-side services; no client-side direct DB access |
 | III. Component-First Frontend | ✅ PASS | Each page (Orders, Products, Expenses, Ledger, Work Hours) decomposes into focused components; shared state via injected services |
 | IV. Observability by Default | ✅ PASS | OpenTelemetry already configured in api/Program.cs; structured logging required in all new Functions |
 | V. Simplicity First | ✅ PASS | Temporal table handles price history without a custom audit log abstraction; no speculative categories or multi-location support |
@@ -79,46 +75,17 @@ specs/001-cafe-employee-app/
 ### Source Code (repository root)
 
 ```text
-src/Client/                          # Blazor WebAssembly frontend (existing)
-├── Pages/
-│   ├── Orders/
-│   │   ├── OrdersPage.razor         # Order submission page
-│   │   └── Components/
-│   │       ├── ProductPicker.razor
-│   │       └── OrderSummary.razor
-│   ├── Products/
-│   │   ├── ProductsPage.razor
-│   │   └── Components/
-│   │       ├── ProductForm.razor
-│   │       └── PriceHistory.razor
-│   ├── Expenses/
-│   │   ├── ExpensesPage.razor
-│   │   └── Components/
-│   │       └── ExpenseForm.razor
-│   ├── Ledger/
-│   │   └── LedgerPage.razor
-│   └── WorkHours/
-│       ├── WorkHoursPage.razor
-│       └── Components/
-│           └── WorkSessionForm.razor
-├── Services/                        # HttpClient wrappers per domain
-│   ├── ProductsService.cs
-│   ├── OrdersService.cs
-│   ├── ExpensesService.cs
-│   ├── LedgerService.cs
-│   └── WorkSessionsService.cs
-└── Layout/                          # Existing — extend NavMenu
-
-api/                                 # Azure Functions backend (existing)
-├── Functions/
-│   ├── ProductsFunctions.cs
-│   ├── OrdersFunctions.cs
-│   ├── ExpensesFunctions.cs
-│   ├── LedgerFunctions.cs
-│   └── WorkSessionsFunctions.cs
+App/                                 # Standalone Blazor Server app
+├── Components/
+│   ├── Layout/
+│   └── Pages/
+│       ├── Orders/
+│       ├── Products/
+│       ├── Expenses/
+│       ├── Ledger/
+│       └── WorkHours/
 ├── Data/
-│   ├── AppDbContext.cs
-│   └── Migrations/
+│   └── AppDbContext.cs
 ├── Models/
 │   ├── Product.cs
 │   ├── Order.cs
@@ -126,9 +93,14 @@ api/                                 # Azure Functions backend (existing)
 │   ├── Expense.cs
 │   ├── WorkSession.cs
 │   └── Employee.cs
-└── Program.cs                       # Existing — add EF Core + Identity.Web registration
+├── Services/                        # Server-side domain services per area
+│   ├── ProductsService.cs
+│   ├── OrdersService.cs
+│   ├── ExpensesService.cs
+│   ├── LedgerService.cs
+│   └── WorkSessionsService.cs
+└── Program.cs
 ```
 
-**Structure Decision**: Existing `src/Client` (Blazor WASM) and `api` (Azure Functions) layout
-retained. Pages are added under `src/Client/Pages/` using sub-folders per domain; Functions are
-added under `api/Functions/` one file per domain. No new projects required.
+**Structure Decision**: Consolidate the application into the existing `App` project so UI,
+domain services, data access, and database models live in one standalone Blazor Server codebase.

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>aspnet-BlazorApp1-c131a669-9c15-4567-8308-1279dc6c1e51</UserSecretsId>
+        <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+        <RootNamespace>BlazorApp1</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.9"/>
+        <PackageReference Include="MudBlazor" Version="6.15.0"/>
+    </ItemGroup>
+
+</Project>

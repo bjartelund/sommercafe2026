@@ -5,7 +5,7 @@ public class ValidationTests
     [Test]
     public async Task Placeholder_CompilationTest()
     {
-        // Placeholder test to verify test project compiles and runs
-        await Assert.That(1 + 1).IsEqualTo(2);
+        var value = 1 + 1;
+        await Assert.That(value).IsEqualTo(2);
     }
 }
