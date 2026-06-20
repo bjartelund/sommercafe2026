@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Amend existing specification: Replace default Blazor Bootstrap-based UI. Use MudBlazor for all UI components. Ensure consistent layout with top navigation and drawer. No Bootstrap usage. Scope: UI layer only. Do not change backend or API design"
+**Input**: User description: "Amend existing specification: Replace default Blazor Bootstrap-based UI. Use MudBlazor for all UI components. Ensure consistent layout with a responsive drawer-style navigation and no separate top header bar. No Bootstrap usage. Scope: UI layer only. Do not change backend or API design"
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -21,8 +21,8 @@ Employees navigate between Orders, Products, Expenses, Ledger, and Work Hours pa
 **Acceptance Scenarios**:
 
 1. **Given** a user is on any main page, **When** they click a navigation link, **Then** the page changes and the navigation element for the new page is visually highlighted as active
-2. **Given** a user opens the application, **When** the page loads on a mobile or tablet viewport, **Then** the navigation drawer collapses to a hamburger icon and can be toggled open/closed
-3. **Given** a user is viewing the application on a desktop viewport, **When** they interact with the UI, **Then** the navigation drawer remains visible as a persistent sidebar
+2. **Given** a user opens the application on a mobile or tablet viewport, **When** the page loads, **Then** the left navigation collapses to an icon rail and can be expanded or collapsed with a tap
+3. **Given** a user is viewing the application on a desktop viewport, **When** they interact with the UI, **Then** the navigation remains visible as a persistent left sidebar without a separate header bar
 
 ---
 
@@ -97,8 +97,8 @@ The application supports both light and dark color schemes. Employees can toggle
 - **FR-002**: MudBlazor NuGet package MUST be added to `src/Client/Client.csproj`
 - **FR-003**: MudBlazor MUST be initialized in `src/Client/Program.cs` with `services.AddMudServices()`
 - **FR-004**: All Razor pages and components MUST be refactored to use MudBlazor components (MudTable, MudButton, MudTextField, MudCard, etc.) instead of Bootstrap HTML elements
-- **FR-005**: Navigation layout MUST use MudAppBar (top bar) and MudDrawer (sidebar) to create a persistent, responsive navigation pattern
-- **FR-006**: Mobile navigation MUST collapse the drawer to a hamburger menu on viewports narrower than 960px
+- **FR-005**: Navigation layout MUST use a persistent left sidebar and MUST NOT require a separate top header bar
+- **FR-006**: Mobile and tablet navigation MUST collapse the sidebar to an icon rail on viewports narrower than 960px and allow expansion on demand
 - **FR-007**: All form inputs MUST use MudBlazor input components (MudTextField, MudNumericField, MudSelect, MudDatePicker, etc.)
 - **FR-008**: All buttons MUST use MudButton with appropriate Variant (Text, Outlined, Filled) and Color attributes
 - **FR-009**: All tables MUST use MudTable with striped rows, proper column alignment, and sortable column headers
@@ -131,6 +131,6 @@ The application supports both light and dark color schemes. Employees can toggle
 - **No behavior changes**: Component refactoring updates the visual presentation; all business logic, validation, and API calls remain identical.
 - **MudBlazor version**: MudBlazor v6.x or later is compatible with .NET 10 and Blazor WASM hosting model assumed.
 - **No external styling**: All styling comes from MudBlazor theme; custom CSS is minimized (MudBlazor's theme system is the primary styling approach).
-- **Persistent navigation model**: The top app bar + drawer pattern is the chosen persistent navigation paradigm; tab-based or bottom navigation is out of scope.
+- **Persistent navigation model**: A left sidebar / icon-rail pattern is the chosen persistent navigation paradigm; tab-based or bottom navigation is out of scope.
 - **Existing component structure preserved**: Current component hierarchy (pages → composite components → leaf components) remains unchanged; refactoring updates component internals, not their structure or public APIs.
 - **Browser compatibility**: MudBlazor targets modern browsers (Chrome, Firefox, Safari, Edge) with no legacy IE support required.

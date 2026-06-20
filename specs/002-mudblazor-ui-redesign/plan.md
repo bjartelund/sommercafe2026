@@ -35,7 +35,7 @@ Replace the default Blazor Bootstrap-based UI with MudBlazor components across a
 ✅ **Principle III (Component-First Frontend)**: PASS
 - UI refactoring maintains component boundaries and single-responsibility pattern
 - No changes to component public interfaces (parameters, EventCallbacks)
-- Shared navigation pattern (MudAppBar + MudDrawer) reinforces component composition
+- Shared navigation pattern (persistent sidebar + responsive icon rail) reinforces component composition
 
 ✅ **Principle V (Simplicity First)**: PASS
 - MudBlazor is a direct replacement for Bootstrap; no new abstractions introduced
@@ -87,8 +87,8 @@ src/Client/
 │       └── Components/
 │           └── WorkSessionForm.razor [REFACTOR to MudBlazor]
 ├── Layout/
-│   ├── MainLayout.razor              [REFACTOR to use MudAppBar + MudDrawer]
-│   └── NavMenu.razor                 [REFACTOR to MudNavMenu / MudAppBar]
+│   ├── MainLayout.razor              [REFACTOR to use responsive sidebar layout]
+│   └── NavMenu.razor                 [REFACTOR to icon-first MudNavMenu]
 ├── Shared/
 │   └── App.razor                     [No changes; wraps layout and router]
 ├── wwwroot/
@@ -98,7 +98,7 @@ src/Client/
 └── Client.csproj                     [Add MudBlazor NuGet; remove Bootstrap ref]
 ```
 
-**Structure Decision**: UI-layer-only refactoring preserves existing code structure. MudBlazor components replace Bootstrap HTML elements and utility classes one-to-one. Shared layout strategy (MudAppBar + MudDrawer) applied consistently across all pages.
+**Structure Decision**: UI-layer-only refactoring preserves existing code structure. MudBlazor components replace Bootstrap HTML elements and utility classes one-to-one. Shared layout strategy (persistent sidebar with responsive icon rail behavior) applied consistently across all pages.
 
 ## Complexity Tracking
 
